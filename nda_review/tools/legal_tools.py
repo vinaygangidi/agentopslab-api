@@ -10,7 +10,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from crewai.tools import tool
 
-load_dotenv(Path(__file__).parent.parent.parent.parent.parent / ".env")
+REPO_ROOT = Path(__file__).parent.parent.parent
+load_dotenv(REPO_ROOT / ".env")
 
 # ── Mistral client (lazy init) ─────────────────────────────────────────────
 _mistral_client = None
@@ -18,7 +19,7 @@ _mistral_client = None
 def get_mistral_client():
     global _mistral_client
     if _mistral_client is None:
-        from mistralai.client import Mistral
+        from mistralai import Mistral
         api_key = os.getenv("MISTRAL_API_KEY")
         if not api_key:
             raise ValueError("MISTRAL_API_KEY not set in environment")
@@ -26,10 +27,9 @@ def get_mistral_client():
     return _mistral_client
 
 # ── Playbook path ──────────────────────────────────────────────────────────
-PLAYBOOK_PATH = (
-    Path(__file__).parent.parent.parent.parent.parent
-    / "agents" / "legal" / "contract-review" / "playbooks" / "nda_playbook.json"
-)
+# Resolves inside the repo. If the file is absent, playbook_checker_tool falls
+# back to the model's own legal knowledge (see its except branch below).
+PLAYBOOK_PATH = REPO_ROOT / "playbooks" / "nda_playbook.json"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
