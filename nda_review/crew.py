@@ -24,9 +24,8 @@ import argparse
 from pathlib import Path
 from crewai import Agent, Task, Crew, Process
 
-# Add parent dirs to path so tools can import cleanly
+# Add this package dir to path so `tools` and `report_writer` import cleanly
 sys.path.insert(0, str(Path(__file__).parent))
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 from tools.legal_tools import (
     pdf_parser_tool,
@@ -39,13 +38,15 @@ from report_writer import write_report
 
 # Load env and configure Claude
 from dotenv import load_dotenv
-load_dotenv(Path(__file__).parent.parent.parent.parent.parent / ".env")
-CLAUDE = "anthropic/claude-sonnet-4-20250514"
 
 # ── Resolve paths ─────────────────────────────────────────────
 CREW_DIR     = Path(__file__).parent
+REPO_ROOT    = CREW_DIR.parent
 OUTPUT_DIR   = CREW_DIR / "output"
-NDA_DIR      = CREW_DIR.parent.parent.parent / "test-data" / "legal" / "ndas"
+NDA_DIR      = REPO_ROOT / "test-data" / "ndas"
+
+load_dotenv(REPO_ROOT / ".env")
+CLAUDE = "anthropic/claude-sonnet-4-20250514"
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 
